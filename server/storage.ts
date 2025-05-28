@@ -89,10 +89,7 @@ export class DatabaseStorage implements IStorage {
       sortOrder = 'desc'
     } = options;
 
-    let query = db.select().from(transactions).where(eq(transactions.userId, userId));
-    let countQuery = db.select({ count: sql<number>`count(*)` }).from(transactions).where(eq(transactions.userId, userId));
-
-    // Apply filters
+    // Build where conditions
     const conditions = [eq(transactions.userId, userId)];
     
     if (category) {
@@ -107,10 +104,11 @@ export class DatabaseStorage implements IStorage {
       conditions.push(like(transactions.assetName, `%${search}%`));
     }
 
-    if (conditions.length > 1) {
-      query = query.where(and(...conditions));
-      countQuery = countQuery.where(and(...conditions));
-    }
+    const whereConditions = conditions.length > 1 ? and(...conditions) : conditions[0];
+
+    // Build queries
+    let query = db.select().from(transactions).where(whereConditions);
+    const countQuery = db.select({ count: sql<number>`count(*)` }).from(transactions).where(whereConditions);
 
     // Apply sorting
     const sortColumn = sortBy === 'amount' ? transactions.amount : 
@@ -273,7 +271,7 @@ export class DatabaseStorage implements IStorage {
       .select({
         month: sql<string>`TO_CHAR(${transactions.date}, 'YYYY-MM')`,
         spending: sql<number>`COALESCE(SUM(CASE 
-          WHEN ${transactions.category} IN ('UPI', 'Bank Transfer') THEN ${transactions.amount}
+          WHEN ${transactions.category} IN ('UPI Payment', 'Bank Transfer') THEN ${transactions.amount}
           ELSE 0
         END), 0)`,
         investments: sql<number>`COALESCE(SUM(CASE 
@@ -284,7 +282,7 @@ export class DatabaseStorage implements IStorage {
       .from(transactions)
       .where(and(
         eq(transactions.userId, userId),
-        sql`${transactions.date} >= CURRENT_DATE - INTERVAL '${months} months'`
+        sql`${transactions.date} >= CURRENT_DATE - INTERVAL '${sql.raw(months.toString())} months'`
       ))
       .groupBy(sql`TO_CHAR(${transactions.date}, 'YYYY-MM')`)
       .orderBy(sql`TO_CHAR(${transactions.date}, 'YYYY-MM')`);
