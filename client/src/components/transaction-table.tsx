@@ -109,7 +109,9 @@ export function TransactionTable() {
   };
 
   const handleFilterChange = (key: keyof TransactionFilters, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    // Convert "all" back to empty string for API compatibility
+    const filterValue = value === "all" ? "" : value;
+    setFilters(prev => ({ ...prev, [key]: filterValue }));
     setPage(1); // Reset to first page when filtering
   };
 
@@ -147,7 +149,7 @@ export function TransactionTable() {
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {CATEGORIES.map((category) => (
                   <SelectItem key={category} value={category}>
                     {category}

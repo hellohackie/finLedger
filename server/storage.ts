@@ -282,7 +282,7 @@ export class DatabaseStorage implements IStorage {
       .from(transactions)
       .where(and(
         eq(transactions.userId, userId),
-        sql`${transactions.date} >= CURRENT_DATE - INTERVAL '${sql.raw(months.toString())} months'`
+        sql`${transactions.date} >= CURRENT_DATE - INTERVAL ${months} MONTH`
       ))
       .groupBy(sql`TO_CHAR(${transactions.date}, 'YYYY-MM')`)
       .orderBy(sql`TO_CHAR(${transactions.date}, 'YYYY-MM')`);
