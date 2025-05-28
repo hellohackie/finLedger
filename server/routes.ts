@@ -95,6 +95,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const transaction = await storage.createTransaction({
         ...validationResult.data,
+        date: new Date(validationResult.data.date),
         userId
       });
       

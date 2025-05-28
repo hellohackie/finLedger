@@ -267,6 +267,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getMonthlySpendingTrend(userId: string, months: number = 6): Promise<{ month: string; spending: number; investments: number }[]> {
+    // For now, return empty array when no data exists to avoid query complexity
+    const count = await db
+      .select({ count: sql<number>`COUNT(*)` })
+      .from(transactions)
+      .where(eq(transactions.userId, userId));
+
+    if (count[0]?.count === 0) {
+      return [];
+    }
+
     const result = await db
       .select({
         month: sql<string>`TO_CHAR(${transactions.date}, 'YYYY-MM')`,
@@ -280,12 +290,10 @@ export class DatabaseStorage implements IStorage {
         END), 0)`
       })
       .from(transactions)
-      .where(and(
-        eq(transactions.userId, userId),
-        sql`${transactions.date} >= CURRENT_DATE - INTERVAL ${months} MONTH`
-      ))
+      .where(eq(transactions.userId, userId))
       .groupBy(sql`TO_CHAR(${transactions.date}, 'YYYY-MM')`)
-      .orderBy(sql`TO_CHAR(${transactions.date}, 'YYYY-MM')`);
+      .orderBy(sql`TO_CHAR(${transactions.date}, 'YYYY-MM')`)
+      .limit(months);
 
     return result;
   }
