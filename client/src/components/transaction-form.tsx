@@ -70,10 +70,14 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
   const createTransactionMutation = useMutation({
     mutationFn: async (data: TransactionFormData) => {
       const response = await apiRequest("POST", "/api/transactions", {
-        ...data,
+        platform: data.platform,
+        category: data.category,
+        type: data.type,
+        assetName: data.assetName,
         amount: data.amount,
-        quantity: data.quantity ? data.quantity : null,
-        date: new Date(data.date).toISOString(),
+        quantity: data.quantity || undefined,
+        date: data.date,
+        notes: data.notes || undefined,
       });
       return response.json();
     },

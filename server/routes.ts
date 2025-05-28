@@ -93,11 +93,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: errorMessage });
       }
 
-      const transaction = await storage.createTransaction({
+      const transactionData = {
         ...validationResult.data,
-        date: new Date(validationResult.data.date),
+        date: typeof validationResult.data.date === 'string' 
+          ? new Date(validationResult.data.date) 
+          : validationResult.data.date,
         userId
-      });
+      };
+
+      const transaction = await storage.createTransaction(transactionData);
       
       res.status(201).json(transaction);
     } catch (error) {

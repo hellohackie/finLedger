@@ -70,6 +70,8 @@ export const insertTransactionSchema = createInsertSchema(transactions).omit({
   userId: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  date: z.string().or(z.date()),
 });
 
 export const updateTransactionSchema = createInsertSchema(transactions).omit({
