@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
+import { redirectToLogout } from "@/lib/authUtils";
 
 export function Navigation() {
   const [location] = useLocation();
@@ -94,11 +95,9 @@ export function Navigation() {
                       </p>
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <a href="/api/logout" className="flex items-center">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </a>
+                  <DropdownMenuItem onClick={redirectToLogout} className="flex items-center cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartLine, Shield, Smartphone, TrendingUp } from "lucide-react";
+import { redirectToLogin } from "@/lib/authUtils";
 
 export default function Landing() {
   return (
@@ -13,8 +14,8 @@ export default function Landing() {
               <ChartLine className="h-8 w-8 text-primary mr-3" />
               <h1 className="text-xl font-bold text-gray-900">FinLedger</h1>
             </div>
-            <Button asChild>
-              <a href="/api/login">Sign In</a>
+            <Button onClick={redirectToLogin}>
+              Sign In
             </Button>
           </div>
         </div>
@@ -104,8 +105,8 @@ export default function Landing() {
           <p className="text-xl text-blue-100 mb-8">
             Join thousands of users who trust FinLedger with their financial tracking.
           </p>
-          <Button size="lg" variant="secondary" asChild className="text-lg px-8 py-3">
-            <a href="/api/login">Start Tracking Today</a>
+          <Button size="lg" variant="secondary" onClick={redirectToLogin} className="text-lg px-8 py-3">
+            Start Tracking Today
           </Button>
         </div>
       </section>
