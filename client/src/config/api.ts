@@ -10,30 +10,33 @@ export interface ApiConfig {
 // Backend configurations
 const BACKEND_CONFIGS = {
   nodejs: {
-    baseUrl: 'http://localhost:5000',
+    baseUrl: import.meta.env.VITE_NODEJS_BACKEND_URL || 'http://localhost:5000',
     timeout: 10000,
     backend: 'nodejs' as const,
   },
   java: {
-    baseUrl: 'http://localhost:8080',
+    baseUrl: import.meta.env.VITE_JAVA_BACKEND_URL || 'http://localhost:8080',
     timeout: 10000,
     backend: 'java' as const,
   },
 } as const;
 
-// Current backend selection - Change this to switch backends
-const SELECTED_BACKEND: keyof typeof BACKEND_CONFIGS = 'nodejs';
+// Determine backend selection
+const getSelectedBackend = (): keyof typeof BACKEND_CONFIGS => {
+  // 1. Check environment variable first
+  if (import.meta.env.VITE_BACKEND_TYPE) {
+    const envBackend = import.meta.env.VITE_BACKEND_TYPE as keyof typeof BACKEND_CONFIGS;
+    if (BACKEND_CONFIGS[envBackend]) {
+      return envBackend;
+    }
+  }
+  
+  // 2. Default to nodejs
+  return 'nodejs';
+};
 
 // Export the current configuration
-export const API_CONFIG: ApiConfig = BACKEND_CONFIGS[SELECTED_BACKEND];
-
-// Environment-based override (optional)
-if (import.meta.env.VITE_BACKEND_TYPE) {
-  const envBackend = import.meta.env.VITE_BACKEND_TYPE as keyof typeof BACKEND_CONFIGS;
-  if (BACKEND_CONFIGS[envBackend]) {
-    Object.assign(API_CONFIG, BACKEND_CONFIGS[envBackend]);
-  }
-}
+export const API_CONFIG: ApiConfig = BACKEND_CONFIGS[getSelectedBackend()];
 
 // API endpoint builders
 export const buildApiUrl = (endpoint: string): string => {
